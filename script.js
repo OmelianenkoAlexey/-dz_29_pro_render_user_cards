@@ -94,14 +94,14 @@ const users = [
 		courses: [
 			{
 				"title": "Front-end Pro",
-				"score": 78,
-				"studentsScore": 79
+				"score": 15,
+				"studentsScore": 45
 			},
 			{
 				"title": "Java Enterprise",
-				"score": 85,
+				"score": 70,
 				"studentsScore": 86
-			}
+			},
 		]
 	}
 ];
@@ -124,6 +124,36 @@ const gradation = {
 // В классах Lector, Admin переопределяем метод renderCourses для того, что бы в нужном виде отобразить список курсов.
 // Заданную html - разметку и css - классы для каждого блока можете править как хотите) Главное – визуально отобразить так, как на картинке.
 let list = [];
+let elem = [];
+
+function upString(item) {
+	let slovo = "";
+	for (let i = 0; i < item.length; i++) {
+		if (i === 0) {
+			slovo = slovo + item[i].toUpperCase();
+		} else if (item[i - 1] === "-") {
+			slovo = slovo + item[i].toUpperCase();
+		} else {
+			slovo = slovo + item[i];
+		}
+	}
+	return slovo.replace("-", " ");
+}
+
+function numbers(item, grad) {
+	let status;
+	if (item <= 20) {
+		status = grad[20];
+	} else if (item > 20 && item <= 55) {
+		status = grad[55];
+	} else if (item > 55 && item <= 85) {
+		status = grad[85];
+	} else if (item > 85 && item <= 100) {
+		status = grad[100];
+	};
+	return status;
+}
+
 class User {
 	constructor(name, age, img, role, courses) {
 		this.name = name;
@@ -133,27 +163,21 @@ class User {
 		this.courses = courses;
 	}
 
-	render(rol, grad) {
-		let elem = [];
-		if (this.courses) {
-			this.courses
-				.forEach(function (item) {
-					let status;
-					if (item.mark <= 20) {
-						status = "satisfactory";
-					} else if (item.mark > 20 && item.mark <= 55) {
-						status = "good";
-					} else if (item.mark > 55 && item.mark <= 85) {
-						status = "very-good";
-					} else if (item.mark > 85 && item.mark <= 100) {
-						status = "excellent";
-					}
-					elem.push(`
-			    <p class="user__courses--course {this.role.toLowerCase()}">
-			        ${item.title} <span class="${status}">${upString(status)}</span>
-			     </p>
+	renderCourses(rol, grad) {
+		elem = [];
+		let rol_1 = this.role;
+		this.courses.forEach(function (item) {
+			elem.push(`
+			    <p class="user__courses--course ${rol_1}">
+			        ${item.title} <span class="${numbers(item.mark, gradation)}">${upString(numbers(item.mark, gradation))}</span>
+			    </p>
 			`)
-				})
+		});
+	};
+	render(rol, grad) {
+		let nameAdmin = "";
+		if (this.role !== "student") {
+			nameAdmin = "admin--info";
 		}
 		list.push(`
 		<div class="user">
@@ -165,106 +189,17 @@ class User {
                         <p>Age: <b>${this.age}</b></p>
                     </div>
                 </div>
-                <div class="user__info--role ${this.role.toLowerCase()}">
-                    <img src="${rol.student}" alt="${this.role.toLowerCase()}" height="25">
+                <div class="user__info--role ${this.role}">
+                    <img src="${rol.student}" alt="${this.role}" height="25">
                     <p>${this.role}</p>
                 </div>
             </div>
-				    <div class="user__courses">
-			${elem.join("")}
+				<div class="user__courses ${nameAdmin}">
+					${elem.join("")}
 			    </div>
         </div>`)
-		return list;
-	}
-
-	renderCourses(rol, grad) {
-		let rol_1 = this.role;
-		let elem = [];
-
-		if (this.role === "admin") {
-			if (this.courses) {
-				this.courses
-					.forEach(function (item) {
-						let status;
-						if (item.score <= 20) {
-							status = "satisfactory";
-						} else if (item.score > 20 && item.score <= 55) {
-							status = "good";
-						} else if (item.score > 55 && item.score <= 85) {
-							status = "very-good";
-						} else if (item.score > 85 && item.score <= 100) {
-							status = "excellent";
-						}
-						elem.push(`
-				<div class="user__courses--course {this.role.toLowerCase()}">
-					<p>Title: <b>${item.title}</b></p>
-					<p>${rol_1}'s score: <span class="${status}">${upString(status)}</span></p>
-					<p>Lector: <b>${item.lector}</b></p>
-				</div>
-			`)
-					})
-			}
-		} else if (this.role === "lector") {
-			if (this.courses) {
-				this.courses
-					.forEach(function (item) {
-						let status;
-						let statusStud;
-						if (item.score <= 20) {
-							status = "satisfactory";
-						} else if (item.score > 20 && item.score <= 55) {
-							status = "good";
-						} else if (item.score > 55 && item.score <= 85) {
-							status = "very-good";
-						} else if (item.score > 85 && item.score <= 100) {
-							status = "excellent";
-						}
-
-						if (item.studentsScore <= 20) {
-							statusStud = "satisfactory";
-						} else if (item.studentsScore > 20 && item.studentsScore <= 55) {
-							statusStud = "good";
-						} else if (item.studentsScore > 55 && item.studentsScore <= 85) {
-							statusStud = "very-good";
-						} else if (item.studentsScore > 85 && item.studentsScore <= 100) {
-							statusStud = "excellent";
-						}
-
-						elem.push(`
-				<div class="user__courses--course {this.role.toLowerCase()}">
-					<p>Title: <b>${item.title}</b></p>
-					<p>${rol_1}'s score: <span class="${status}">${upString(status)}</span></p>
-					<p>Average student's score: <span class="${statusStud}">${upString(statusStud)}</span></p>
-				</div>
-			`)
-					})
-			}
-		}
-
-		list.push(`
-		<div class="user">
-			<div class="user__info">
-	            <div class="user__info--data">
-	                <img src="${this.img}" alt="${this.name}" height="50">
-	                <div class="user__naming">
-	                    <p>Name: <b>${this.name}</b></p>
-	                    <p>Age: <b>${this.age}</b></p>
-	                </div>
-	            </div>
-	            <div class="user__info--role ${this.role.toLowerCase()}">
-	                <img src="image/${this.role.toLowerCase()}.svg" alt="${this.role.toLowerCase()}" height="25">
-	                <p>${this.role}</p>
-	            </div>
-	        </div>
-
-			<div class="user__courses admin--info">
-			${elem.join("")}
-			</div>
-	    </div>`)
+		elem = [];
 	};
-	test() {
-		console.log("test");
-	}
 }
 
 class Student extends User {
@@ -276,14 +211,38 @@ class Student extends User {
 class Lector extends User {
 	constructor(name, age, img, role, courses) {
 		super(name, age, img, role, courses);
-		// super.renderCourses(roles, gradation);
+	}
+
+	renderCourses(rol, grad) {
+		let rol_1 = this.role;
+		this.courses.forEach(function (item) {
+			// console.log(item.studentsScore);
+			elem.push(`
+				<div class="user__courses--course ${rol_1}">
+					<p>Title: <b>${item.title}</b></p>
+					<p>${upString(rol_1)}'s score: <span class="${numbers(item.score, gradation)}">${upString(numbers(item.score, gradation))}</span></p>
+					<p>Average student's score: <span class="${numbers(item.studentsScore, gradation)}">${upString(numbers(item.studentsScore, gradation))}</span></p>
+				</div>
+				`)
+		});
 	}
 }
 
 class Admin extends User {
 	constructor(name, age, img, role, courses) {
 		super(name, age, img, role, courses);
-		// super.renderCourses(roles, gradation);
+	}
+	renderCourses(rol, grad) {
+		let rol_1 = this.role;
+		this.courses.forEach(function (item) {
+			elem.push(`
+				<div class="user__courses--course ${rol_1}">
+					<p>Title: <b>${item.title}</b></p>
+					<p>${upString(rol_1)}'s score: <span class="${numbers(item.score, gradation)}">${upString(numbers(item.score, gradation))}</span></p>
+					<p>Lector: <b>${item.lector}</b></p>
+				</div>
+				`)
+		});
 	}
 }
 
@@ -300,26 +259,12 @@ users
 		}
 	})
 	.forEach(function (item) {
-		if (item.role === 'student') {
-			return item.render(roles, gradation);
-		} else {
-			return item.renderCourses(roles, gradation);
+
+		if (item.courses) {
+			item.renderCourses(roles, gradation);
 		}
+		item.render(roles, gradation);
 	})
 
 document.write(`<div class="users">${list.join("")}</div>`)
-
-function upString(item) {
-	let slovo = "";
-	for (let i = 0; i < item.length; i++) {
-		if (i === 0) {
-			slovo = slovo + item[i].toUpperCase();
-		} else if (item[i - 1] === "-") {
-			slovo = slovo + item[i].toUpperCase();
-		} else {
-			slovo = slovo + item[i];
-		}
-	}
-	return slovo.replace("-", " ");
-}
 
