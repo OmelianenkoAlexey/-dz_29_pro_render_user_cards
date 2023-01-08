@@ -165,10 +165,9 @@ class User {
 
 	renderCourses(rol, grad) {
 		elem = [];
-		let rol_1 = this.role;
-		this.courses.forEach(function (item) {
+		this.courses.forEach((item) => {
 			elem.push(`
-			    <p class="user__courses--course ${rol_1}">
+			    <p class="user__courses--course ${this.role}">
 			        ${item.title} <span class="${numbers(item.mark, gradation)}">${upString(numbers(item.mark, gradation))}</span>
 			    </p>
 			`)
@@ -214,13 +213,11 @@ class Lector extends User {
 	}
 
 	renderCourses(rol, grad) {
-		let rol_1 = this.role;
-		this.courses.forEach(function (item) {
-			// console.log(item.studentsScore);
+		this.courses.forEach((item) => {
 			elem.push(`
-				<div class="user__courses--course ${rol_1}">
+				<div class="user__courses--course ${this.role}">
 					<p>Title: <b>${item.title}</b></p>
-					<p>${upString(rol_1)}'s score: <span class="${numbers(item.score, gradation)}">${upString(numbers(item.score, gradation))}</span></p>
+					<p>${upString(this.role)}'s score: <span class="${numbers(item.score, gradation)}">${upString(numbers(item.score, gradation))}</span></p>
 					<p>Average student's score: <span class="${numbers(item.studentsScore, gradation)}">${upString(numbers(item.studentsScore, gradation))}</span></p>
 				</div>
 				`)
@@ -233,12 +230,11 @@ class Admin extends User {
 		super(name, age, img, role, courses);
 	}
 	renderCourses(rol, grad) {
-		let rol_1 = this.role;
-		this.courses.forEach(function (item) {
+		this.courses.forEach((item) => {
 			elem.push(`
-				<div class="user__courses--course ${rol_1}">
+				<div class="user__courses--course ${this.role}">
 					<p>Title: <b>${item.title}</b></p>
-					<p>${upString(rol_1)}'s score: <span class="${numbers(item.score, gradation)}">${upString(numbers(item.score, gradation))}</span></p>
+					<p>${upString(this.role)}'s score: <span class="${numbers(item.score, gradation)}">${upString(numbers(item.score, gradation))}</span></p>
 					<p>Lector: <b>${item.lector}</b></p>
 				</div>
 				`)
@@ -247,7 +243,7 @@ class Admin extends User {
 }
 
 users
-	.map(function (item) {
+	.map((item) => {
 		if (item.role === "student") {
 			return new Student(item.name, item.age, item.img, item.role, item.courses);
 		}
@@ -258,8 +254,7 @@ users
 			return new Lector(item.name, item.age, item.img, item.role, item.courses);
 		}
 	})
-	.forEach(function (item) {
-
+	.forEach((item) => {
 		if (item.courses) {
 			item.renderCourses(roles, gradation);
 		}
